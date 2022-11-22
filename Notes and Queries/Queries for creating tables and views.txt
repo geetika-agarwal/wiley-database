@@ -1,0 +1,40 @@
+CREATE TABLE Person(
+PersonId int PRIMARY KEY,
+FirstName VARCHAR(20) NOT NULL,
+MiddleInitial VARCHAR(20),
+LastName VARCHAR(20),
+DateOfBirth DATE
+);
+
+CREATE TABLE Course(
+CourseId int PRIMARY KEY,
+Name varchar(20) NOT NULL,
+Teacher varchar(20) NOT NULL
+);
+
+CREATE TABLE Student (
+StudentId int PRIMARY KEY,
+PersonId int references Person(PersonId),
+Email varchar(200) NOT NULL
+);
+
+
+CREATE TABLE Credit(
+StudentId int NOT NULL references Student(StudentId),
+CourseId int NOT NULL references Course(CourseId),
+Grade int,
+Attempt TINYINT(1) DEFAULT 1
+);
+
+
+INSERT INTO Person(PersonId, FirstName, LastName, DateOfBirth) VALUES(2, ‘VAMSI’,’KOPPULA’, ‘2001-07-14’;
+INSERT INTO Student VALUES(102,2,’vamsi.koppula@gmail.com’);
+INSERT INTO Course VALUES(3,’Structured Query Language’, ‘Mandar Jog’);
+
+INSERT INTO Credit VALUES
+	(102, 2,'B', 1),
+	(102, 3, null, 0);
+
+
+CREATE VIEW student_names AS (SELECT Firstname, MiddleInitial, LastName FROM Person WHERE PersonId in (SELECT PersonId FROM Student));
+
