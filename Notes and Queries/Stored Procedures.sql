@@ -79,7 +79,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `getPersonDetailsByFirstName`(
 INOUT name varchar(200),
 OUT dob date
 )
-BEGIN
+BEGINs
 	-- input name is name
 	-- output name is fullname,dob
 
@@ -104,24 +104,21 @@ SELECT @name as FullName,@dob;
 —------------------------------------------------------------------------------------------------------------
 IF_ELSE_CONDITION:
 
-CREATE PROCEDURE  `getGradeFromCourseIfAttempted`(
-IN courseId int,
-INT studentId int,
-OUT message varchar(20)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getGradeFromCourseIfAttempted`(
+	IN cId int,
+    IN sId int,
+    OUT message varchar(20)
 )
-
 BEGIN
-
-	SELECT grade 
-	FROM credit
-	WHERE courseId=courseId AND studentId = studentId;
-
-if(grade <> NULL) THEN
-SET message=’Attempted Course’;
-Else
-SET message=’Not Attempted’;
-END IF;
-
+	SET @bgrade = null;
+	select grade into @bgrade from credit 
+    where courseId = cId AND studentId = sId;
+    
+    if(@bgrade IS NULL) THEN
+		set message = 'Not Attempted Course';
+	else
+		set message = 'Attempted';
+	END IF;
 END
 
 –Calling getGradeFromCourseIfAttempted through stored procedures.
@@ -133,26 +130,25 @@ SELECT @message;
 
 SWITCH _CASE:
 
-CREATE PROCEDURE `getPercentage`(
-IN sid int,
-IN cid int,
-OUT percentage int
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getPercentage`(
+	in sid int,
+    in cid int,
+    OUT percentage int
 )
-
 BEGIN
-	SET @varr_grade = null;
-	SELECT grade into @var_grade from credit;
-	WHERE studentId = sid AND courseId = cid;
-	
-case
-when @var_grade = ‘A’ then set percentage =90;
-when @var_grade = ‘B’ then set percentage =80;
-when @var_grade = ‘C’ then set percentage =70;
-when @var_grade = ‘D’ then set percentage =60;
-ELSE SET percentage=0;
-END CASE;
-
+	SET @var_grade = null;
+	SELECT grade into @var_grade from credit
+    where studentId = sid and courseId = cid;
+    
+    case
+		when @var_grade = 'A' then set percentage = 90;
+        when @var_grade = 'B' then set percentage = 80;
+        when @var_grade = 'C' then set percentage = 70;
+        when @var_grade = 'D' then set percentage = 60;
+        ELSE set percentage = 0;        
+	END CASE;
 END
+
 
 –Calling getPercentagethrough stored procedures.
 
@@ -163,22 +159,20 @@ SELECT @per;
 
 LOOPING:
 
-CREATE PROCEDURE `loopPersonDetails`()
-
+CREATE DEFINER=`root`@`localhost` PROCEDURE `loopPersonDetails`()
 BEGIN
-
-DECLARE id ,count int;
-SET id=1;
-SET count = (SELECT count(*) from person);
-personLoop: LOOP
-	SELECT * FROM Person WHERE personId=id;
-	SET id=id+1;
-	if( id >count) then
-	   leave personLoop;
-      end if;
-end LOOP personLoop;
-
+	DECLARE id, count int;
+	SET id = 1;
+	SET count = (SELECT count(*) from person);
+    personLoop: LOOP
+		SELECT * FROm PERSON where personId = id;
+        set id = id+1;
+        if(id > count) then
+			leave personLoop;
+		end if;
+	end LOOP personLoop;
 END
+
 
 –Calling loopPersonDetails stored procedures.
 
