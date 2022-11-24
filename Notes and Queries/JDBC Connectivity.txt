@@ -1,0 +1,142 @@
+JDBC:
+
+	Java Database Connectivity
+	
+	Types of JDBC Driver:
+	
+		Type1 Driver : ODBC Driver given by OS, used for prototyping
+		
+		Type2 Driver: Native Driver (Provided by organizations)
+
+		Type3 Driver: Network Driver
+		
+		Type4 : Vendor Specific Driver (Provided by database)
+	
+----------------------------------------------
+
+Java JDBC API:
+
+	- DriverManager -> getConnection()
+	
+	- Connection -> createStatement()
+	
+	- Statement -> 
+			executeQuery() - ResultSet is returned
+			executeUpdate() - no. of rows that are updated are returned i.e int
+			execute() - boolean value is returned for DDL commands
+	
+		- Prepared Statement: This will hold dynamic valus and the insertions, updation or deletion can be done dring the runTime using setString() function.
+		
+	- ResultSet - The set of values returned after executeQuery(select statements)
+					Contains result
+ 
+---------------------------------------------------------
+
+Example 1: Create Connection: 
+
+
+package jdbc;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class MyConnection {
+	public static Connection getConnection() throws ClassNotFoundException, SQLException {
+		Class.forName("com.mysql.cj.jdbc.Driver");
+
+//		Scanner sc = new Scanner(System.in);
+//		System.out.println("Enter database: ");
+//		String database = sc.nextLine();
+//		System.out.println("Enter database username:");
+//		String username = sc.nextLine();
+//		System.out.println("Enter Password: ");
+//		String password = sc.nextLine();
+		String url = "jdbc:mysql://localhost:3306/group1";
+		Connection con = DriverManager.getConnection(url, "root", "root@123");
+		return con;
+	}
+}
+
+-------------------------------------------------------------------
+
+Example 2: Create simple JBC connectivity using Statement
+
+package jdbc;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class JDBCDemo {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		Connection con = MyConnection.getConnection();
+		System.out.println("Connection Established!!");
+
+		Statement st = con.createStatement();
+//		ResultSet rs = st.executeQuery("select * from person");
+//		while (rs.next()) {
+//			System.out.print(rs.getInt(1) + " ");
+//		}
+
+//		String sqlInsert = "insert into person values (11, 'Alan',null, 'Smith', '2002-05-26');";
+//		int rowsAffected = st.executeUpdate(sqlInsert);
+//		if (rowsAffected > 0)
+//			System.out.println("Row(s) inserted!!");
+//		else
+//			System.out.println("Row(s) didn't insert");
+
+		try {
+			String createSt = "create table user(username varchar(200), password varchar(200))";
+			boolean status = st.execute(createSt);
+			System.out.println(status);
+		} catch (Exception e) {
+			System.out.println("no table with that name exists...");
+		}
+	}
+}
+
+
+----------------------------------------------------------------------------
+
+Example 3: create jdbc connectivity using PreparedStatemenst
+
+package jdbc;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Scanner;
+
+public class PreparedStatementDemo {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		Connection con = MyConnection.getConnection();
+
+		String str = "insert into user values(?, ?)";
+		PreparedStatement pst = con.prepareStatement(str);
+
+		Scanner sc = new Scanner(System.in);
+		pst.execute("truncate table user");
+		System.out.println("Enter the number of rows you want to insert: ");
+		int n = sc.nextInt();
+		for (int i = 0; i < n; i++) {
+			System.out.println("Enter the username for row " + (i + 1));
+			String username = sc.next();
+			System.out.println("Enter the password for row " + (i + 1));
+			String password = sc.next();
+			pst.setString(1, username);
+			pst.setString(2, password);
+			// System.out.println(pst.execute());
+		}
+
+		String selectstr = "select * from user";
+		ResultSet rs = pst.executeQuery(selectstr);
+		while (rs.next()) {
+			System.out.println(rs.getString(1) + "  " + rs.getString(2));
+		}
+
+		System.out.println(pst.execute(selectstr));
+
+	}
+}

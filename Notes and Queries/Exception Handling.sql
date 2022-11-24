@@ -45,7 +45,7 @@ Excetion Handling in SQL:
 		-- body of handler
 	  END;
 	
-	--condition_name: A condition name can be associated with a MySQL error code or SQLSTATE value.
+	-- condition_name: A condition name can be associated with a MySQL error code or SQLSTATE value.
 	
 	DECLARE CONTINUE HANDLER FOR SQLWARNING
 	  BEGIN
